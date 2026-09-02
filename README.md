@@ -103,16 +103,6 @@ rm -rf ~/.config/nvim
 stow -t ~ nvim
 ```
 
-Or pull it into the repo instead and inspect what changed:
-
-```bash
-stow --adopt -t ~ nvim
-git diff          # shows what the local file differed by
-git checkout .    # discard it and keep the repo version
-```
-
-`--adopt` overwrites repo contents with the local file, so always `git diff` afterward.
-
 ## Day-to-day use
 
 Because the files are symlinked, editing config through the normal paths edits the repo:
