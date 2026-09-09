@@ -1,10 +1,9 @@
 local wezterm = require("wezterm")
 
 local config = wezterm.config_builder()
-
 -- ui
-config.color_scheme = "Chalk"
-
+--config.color_scheme = "Chalk"
+config.color_scheme = "kanagawabones"
 
 config.window_frame = {
     font = wezterm.font("Hack Nerd Font", {
@@ -21,15 +20,21 @@ config.font = wezterm.font_with_fallback({
 })
 config.font_size = 16
 
+-- tmux draws your tabs, so wezterm's tab bar is just noise
+config.enable_tab_bar = false
+
+
+
 
 -- keep adding config options here
 config.window_decorations = "RESIZE"
-config.window_background_opacity = 0.8
+config.window_background_opacity = 0.7
 config.macos_window_background_blur = 10
 
 
 config.initial_cols = 120
 config.initial_rows = 32
+
 
 config.keys = {
   {
@@ -51,3 +56,4 @@ config.keys = {
 ---
 
 return config
+
