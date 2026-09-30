@@ -26,6 +26,11 @@ vim.opt.termguicolors = true
 vim.opt.path:append("**")                 -- makes :find recursive
 vim.opt.grepprg = "rg --vimgrep"          -- :grep uses ripgrep
 
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
+
 require("lazy").setup({
   { import = "plugins" },
   
