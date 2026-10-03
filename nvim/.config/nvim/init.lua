@@ -54,6 +54,15 @@ require("lazy").setup({
     "folke/snacks.nvim",
     priority = 1000,
     lazy = false,
+    config = function(_, opts)
+      require("snacks").setup(opts)
+      -- snacks forces tmux allow-passthrough to "all", which lets images from
+      -- hidden windows/panes draw over the visible one. Put it back to "on".
+      if vim.env.TMUX then
+        Snacks.image.terminal.env()
+        vim.fn.system({ "tmux", "set", "-p", "allow-passthrough", "on" })
+      end
+    end,
     opts = {
       picker = {
         enabled = true,

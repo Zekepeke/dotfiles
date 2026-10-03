@@ -93,7 +93,8 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 ### 2. Programs
 
 ```bash
-brew install stow git neovim tmux ripgrep node gh ghostscript poppler
+brew install stow git neovim tmux ripgrep node gh ghostscript poppler tectonic
+npm install -g @mermaid-js/mermaid-cli
 brew install --cask wezterm
 ```
 
@@ -360,6 +361,7 @@ Requires 0.11 or newer.
 - **Snacks:** file picker, grep, buffers, recent files, help, file explorer, image rendering, bigfile protection.
   The picker, grep and explorer show dotfiles such as `.env` and `.gitignore` (but never `.git`).
 - **Navigation:** smart-splits.nvim, paired with the tmux bindings above.
+- **Mermaid and LaTeX:** diagrams (`mmdc`) and math (`tectonic`) render inline in markdown.
 - **PDFs:** render inline through Snacks (needs `ghostscript`), and `Space pt` opens the whole PDF as searchable text (needs `poppler`).
 - **Merge conflicts:** git-conflict.nvim highlights conflict blocks and lets you pick a side with one key.
 - **Copilot:** inline suggestions as you type.
