@@ -56,26 +56,39 @@ require("lazy").setup({
     lazy = false,
     config = function(_, opts)
       require("snacks").setup(opts)
-      -- snacks forces tmux allow-passthrough to "all", which lets images from
-      -- hidden windows/panes draw over the visible one. Put it back to "on".
-      if vim.env.TMUX then
-        Snacks.image.terminal.env()
-        vim.fn.system({ "tmux", "set", "-p", "allow-passthrough", "on" })
-      end
+      -- the explorer ships its own confirm action that overrides config, so wrap it directly
+      local explorer_actions = require("snacks.explorer.actions").actions
+      explorer_actions.confirm = require("util.files").confirm(explorer_actions.confirm)
     end,
     opts = {
       picker = {
         enabled = true,
+        actions = {
+          confirm = require("util.files").confirm(function(...) return Snacks.picker.actions.confirm(...) end),
+        },
         sources = {
           files = { hidden = true, exclude = { ".git" } },
           grep = { hidden = true, exclude = { ".git" } },
-          explorer = { hidden = true, exclude = { ".git" } },
+          explorer = {
+            hidden = true,
+            exclude = { ".git" },
+            actions = {
+              pdf_text = function(picker, item)
+                local path = item and Snacks.picker.util.path(item)
+                if path and path:lower():match("%.pdf$") then
+                  picker:close()
+                  require("util.files").pdf_text(path)
+                end
+              end,
+            },
+            win = { list = { keys = { ["T"] = "pdf_text" } } },
+          },
         },
       },
       explorer = { enabled = true },
       input = { enabled = true },
       bigfile = { enabled = true },
-      image = { enabled = true },
+      image = { enabled = false }, -- inline kitty graphics glitch under tmux + WezTerm; see util/files.lua
     },
     keys = {
       { "<C-f>",      function() Snacks.picker.files() end,   desc = "Find files" },

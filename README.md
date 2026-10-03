@@ -93,7 +93,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 ### 2. Programs
 
 ```bash
-brew install stow git neovim tmux ripgrep node gh ghostscript poppler tectonic
+brew install stow git neovim tmux ripgrep node gh poppler
 npm install -g @mermaid-js/mermaid-cli
 brew install --cask wezterm
 ```
@@ -164,7 +164,7 @@ Check with `nvim --version`.
 
 ```bash
 sudo apt update
-sudo apt install -y git stow tmux ripgrep nodejs npm curl unzip build-essential xclip ghostscript poppler-utils
+sudo apt install -y git stow tmux ripgrep nodejs npm curl unzip build-essential xclip poppler-utils
 ```
 
 Install a current Neovim if the packaged one is too old:
@@ -358,11 +358,12 @@ Requires 0.11 or newer.
 - **Colors:** kanagawa-wave.
 - **Options:** relative line numbers, 4-space indent, smart-case search, system clipboard, `scrolloff=8`, ripgrep as `grepprg`.
 - **Over SSH:** yank goes to your local clipboard through OSC 52.
-- **Snacks:** file picker, grep, buffers, recent files, help, file explorer, image rendering, bigfile protection.
+- **Snacks:** file picker, grep, buffers, recent files, help, file explorer, bigfile protection.
   The picker, grep and explorer show dotfiles such as `.env` and `.gitignore` (but never `.git`).
 - **Navigation:** smart-splits.nvim, paired with the tmux bindings above.
-- **Mermaid and LaTeX:** diagrams (`mmdc`) and math (`tectonic`) render inline in markdown.
-- **PDFs:** render inline through Snacks (needs `ghostscript`), and `Space pt` opens the whole PDF as searchable text (needs `poppler`).
+- **Mermaid:** `Space mm` inside a mermaid block renders it to a PNG (needs `mmdc`) and opens it in Preview.
+- **Images and PDFs:** pressing Enter on one in the explorer or a picker opens it in macOS Preview, because inline kitty graphics are unreliable under tmux + WezTerm, so Snacks' inline images are turned off.
+  `T` on a PDF in the explorer (or `Space pt` in a PDF buffer) opens the whole document as searchable text (needs `poppler`).
 - **Merge conflicts:** git-conflict.nvim highlights conflict blocks and lets you pick a side with one key.
 - **Copilot:** inline suggestions as you type.
 - **LSP:** Mason installs and enables `pyright`, `clangd` and `lua_ls` automatically.
@@ -403,7 +404,8 @@ Leader is `Space`.
 | `Space e` | File explorer |
 | `Alt-h/j/k/l` | Move between splits, and into tmux panes at the edge |
 | `Alt-H/J/K/L` | Resize splits |
-| `Space pt` | Open the current PDF as text |
+| `Enter` on an image or PDF | Open it in macOS Preview |
+| `T` in the explorer, or `Space pt` | Open a PDF as searchable text |
 | `Space gco` / `gct` / `gcb` / `gc0` | Merge conflict: choose ours / theirs / both / none |
 | `]x` / `[x` | Next / previous merge conflict |
 | `Space gcl` | List conflicts in the quickfix list |
@@ -421,6 +423,7 @@ Leader is `Space`.
 | `C-y`, `C-n`, `C-p` | Accept / next / previous completion item |
 | `Space mt` | Toggle markdown rendering |
 | `Space mp` | Toggle the markdown browser preview |
+| `Space mm` | Render the mermaid block under the cursor in Preview |
 
 ### WezTerm
 

@@ -43,6 +43,7 @@ return {
     end,
     keys = {
       { "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", desc = "Markdown browser preview" },
+      { "<leader>mm", function() require("util.files").mermaid_preview() end, desc = "Mermaid block in Preview" },
     },
   },
 }
