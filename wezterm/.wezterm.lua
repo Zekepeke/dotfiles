@@ -32,6 +32,8 @@ config.window_background_opacity = 0.7
 config.macos_window_background_blur = 10
 
 
+config.max_fps = 120
+
 config.initial_cols = 120
 config.initial_rows = 32
 

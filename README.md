@@ -19,6 +19,7 @@ The real files live in this repo and are symlinked into `$HOME`, so editing `~/.
 - [What's configured](#whats-configured)
 - [Keybinding cheat sheet](#keybinding-cheat-sheet)
 - [Workflow](#workflow)
+- [Merge conflicts](#merge-conflicts)
 - [Machine-local overrides](#machine-local-overrides)
 - [Day-to-day use](#day-to-day-use)
 - [Troubleshooting](#troubleshooting)
@@ -53,8 +54,11 @@ dotfiles/
             ├── lazy-lock.json      pinned plugin commits
             └── lua/plugins/
                 ├── colorscheme.lua kanagawa-wave
+                ├── git.lua         merge conflict helpers
                 ├── lsp.lua         Mason, LSP, blink.cmp, treesitter, conform
-                └── markdown.lua    in-buffer rendering + browser preview
+                ├── markdown.lua    in-buffer rendering + browser preview
+                ├── navigation.lua  smart-splits (Alt-hjkl across nvim and tmux)
+                └── pdf.lua         PDF as text
 ```
 
 ## Quick start
@@ -89,7 +93,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 ### 2. Programs
 
 ```bash
-brew install stow git neovim tmux ripgrep node gh
+brew install stow git neovim tmux ripgrep node gh ghostscript poppler
 brew install --cask wezterm
 ```
 
@@ -159,7 +163,7 @@ Check with `nvim --version`.
 
 ```bash
 sudo apt update
-sudo apt install -y git stow tmux ripgrep nodejs npm curl unzip build-essential xclip
+sudo apt install -y git stow tmux ripgrep nodejs npm curl unzip build-essential xclip ghostscript poppler-utils
 ```
 
 Install a current Neovim if the packaged one is too old:
@@ -327,7 +331,7 @@ stow -t ~ nvim
 - Color scheme `kanagawabones`, 16pt `MesloLGS Nerd Font Mono` with a `Symbols Nerd Font Mono` fallback.
 - Translucent window (70% opacity, blur 10) with only a resize border, no title bar.
 - Tab bar disabled, since tmux draws it.
-- Opens at 120x32.
+- Opens at 120x32, capped at 120 fps.
 - Left Option sends Alt (needed for tmux `M-` bindings), right Option still composes characters.
 - `Cmd-a` selects the entire scrollback by driving copy mode.
 
@@ -340,6 +344,8 @@ stow -t ~ nvim
 - Drag, double-click or triple-click in copy mode copies to the system clipboard via `pbcopy`.
 - `set-clipboard on` also emits OSC 52, so copying works over SSH.
 - Extended keys, focus events and passthrough are enabled so Neovim can see modified keys, `autoread` works, and image protocols pass through.
+- `Alt-h/j/k/l` moves between panes and hands the key to Neovim when it is focused, so the same keys cross Neovim splits and tmux panes (smart-splits).
+- `Alt-,` and `Alt-.` go to the previous and next window.
 - `M-o` turns the outer tmux off so a nested tmux on a remote host receives the keys.
 - `~/.tmux.local.conf` is sourced at the end if present.
 
@@ -352,6 +358,10 @@ Requires 0.11 or newer.
 - **Options:** relative line numbers, 4-space indent, smart-case search, system clipboard, `scrolloff=8`, ripgrep as `grepprg`.
 - **Over SSH:** yank goes to your local clipboard through OSC 52.
 - **Snacks:** file picker, grep, buffers, recent files, help, file explorer, image rendering, bigfile protection.
+  The picker, grep and explorer show dotfiles such as `.env` and `.gitignore` (but never `.git`).
+- **Navigation:** smart-splits.nvim, paired with the tmux bindings above.
+- **PDFs:** render inline through Snacks (needs `ghostscript`), and `Space pt` opens the whole PDF as searchable text (needs `poppler`).
+- **Merge conflicts:** git-conflict.nvim highlights conflict blocks and lets you pick a side with one key.
 - **Copilot:** inline suggestions as you type.
 - **LSP:** Mason installs and enables `pyright`, `clangd` and `lua_ls` automatically.
   `lazydev` makes `lua_ls` understand the `vim` global.
@@ -373,8 +383,9 @@ Leader is `Space`.
 | --- | --- |
 | `prefix \|` or `prefix ;` | Split side by side, in the current directory |
 | `prefix -` or `prefix '` | Split top and bottom, in the current directory |
-| `Alt-h/j/k/l` | Move between panes (no prefix) |
-| `Alt-H/J/K/L` | Resize panes by 5 (no prefix) |
+| `Alt-h/j/k/l` | Move between panes and Neovim splits (no prefix) |
+| `Alt-H/J/K/L` | Resize panes and Neovim splits (no prefix) |
+| `Alt-,` / `Alt-.` | Previous / next window |
 | `Alt-w` | Kill the current pane |
 | `Alt-o` | Toggle the outer tmux off and on (for nested tmux) |
 | `prefix r` | Reload the config |
@@ -388,7 +399,12 @@ Leader is `Space`.
 | `Space s` | Grep the codebase |
 | `Space fb` / `fr` / `fh` | Buffers / recent files / help |
 | `Space e` | File explorer |
-| `C-h/j/k/l` | Move between splits |
+| `Alt-h/j/k/l` | Move between splits, and into tmux panes at the edge |
+| `Alt-H/J/K/L` | Resize splits |
+| `Space pt` | Open the current PDF as text |
+| `Space gco` / `gct` / `gcb` / `gc0` | Merge conflict: choose ours / theirs / both / none |
+| `]x` / `[x` | Next / previous merge conflict |
+| `Space gcl` | List conflicts in the quickfix list |
 | `gd` | Go to definition (when an LSP is attached) |
 | `K` | Hover docs |
 | `grn` or `Space r` | Rename symbol |
@@ -418,7 +434,7 @@ How I use it day to day:
 2. Use one window per concern, for example editor, dev server, and an agent or shell.
 3. Split panes with `prefix |` and `prefix -`.
    New panes start in the current directory.
-4. Move around with `Alt-hjkl` and never touch the prefix for navigation.
+4. Move around with `Alt-hjkl`, which crosses Neovim splits and tmux panes alike, and `Alt-,` / `Alt-.` for windows.
 5. In Neovim, jump with `C-f` for files and `Space s` for text.
    Let LSP handle navigation with `gd` and `grr`, and let Copilot and blink.cmp handle typing.
 6. Formatting happens on save, so there is no format step to remember.
@@ -426,6 +442,26 @@ How I use it day to day:
    `Alt-o` turns off my local tmux so keys go to the remote one, and OSC 52 keeps copy and paste working back to my local clipboard.
 8. Close a pane with `Alt-w` and detach with `prefix d`.
    Sessions keep running, so I can reattach later.
+
+## Merge conflicts
+
+Because Stow symlinks into this repo, a conflict is a normal git conflict in `~/dotfiles`.
+Resolve it there and the live config updates immediately.
+
+1. Run `git pull` (or `git merge`) in `~/dotfiles`, and note the conflicted files from `git status`.
+2. Open each file in Neovim.
+   git-conflict.nvim highlights the blocks.
+3. Put the cursor in a block and press `Space gco` (ours), `gct` (theirs), `gcb` (both) or `gc0` (none).
+   Jump between blocks with `]x` and `[x`.
+4. Run `git add <file>` for each resolved file, then `git commit`.
+
+Use the zdiff3 conflict style so each block also shows the common ancestor:
+
+```bash
+git config --global merge.conflictstyle zdiff3
+```
+
+If you get stuck, `git merge --abort` returns to where you started.
 
 ## Machine-local overrides
 

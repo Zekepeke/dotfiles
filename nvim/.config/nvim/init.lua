@@ -26,11 +26,6 @@ vim.opt.termguicolors = true
 vim.opt.path:append("**")                 -- makes :find recursive
 vim.opt.grepprg = "rg --vimgrep"          -- :grep uses ripgrep
 
-vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
-vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
-vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window" })
-vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
-
 require("lazy").setup({
   { import = "plugins" },
   
@@ -60,13 +55,20 @@ require("lazy").setup({
     priority = 1000,
     lazy = false,
     opts = {
-      picker = { enabled = true },
+      picker = {
+        enabled = true,
+        sources = {
+          files = { hidden = true, exclude = { ".git" } },
+          grep = { hidden = true, exclude = { ".git" } },
+          explorer = { hidden = true, exclude = { ".git" } },
+        },
+      },
       explorer = { enabled = true },
       input = { enabled = true },
       bigfile = { enabled = true },
       image = { enabled = true },
     },
-      keys = {
+    keys = {
       { "<C-f>",      function() Snacks.picker.files() end,   desc = "Find files" },
       { "<leader>s",  function() Snacks.picker.grep() end,    desc = "Grep codebase" },
       { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Open buffers" },
